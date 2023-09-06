@@ -72,30 +72,6 @@ def get_system_pythonpaths() -> list[str]:
         logger.warn(f"Failed to execute get_system_pythonpaths(): {str(e)}")
         return []
 
-# Download Remote Binaries to local Plugin
-async def download_remote_binary_to_path(url, binHash, path) -> bool:
-    rv = False
-    try:
-        if os.access(os.path.dirname(path), os.W_OK):
-            async with ClientSession() as client:
-                res = await client.get(url, ssl=get_ssl_context())
-            if res.status == 200:
-                data = BytesIO(await res.read())
-                remoteHash = sha256(data.getbuffer()).hexdigest()
-                if binHash == remoteHash:
-                    data.seek(0)
-                    with open(path, 'wb') as f:
-                        f.write(data.getbuffer())
-                        rv = True
-                else:
-                    raise Exception(f"Fatal Error: Hash Mismatch for remote binary {path}@{url}")
-            else:
-                rv = False
-    except:
-        rv = False
-
-    return rv
-
 # Deprecated
 def set_user():
     pass
